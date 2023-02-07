@@ -1,65 +1,161 @@
-# Phase 1 Project
-
-You've made it all the way through the first phase of this course - take a minute to celebrate your awesomeness!
-
-![awesome](https://raw.githubusercontent.com/learn-co-curriculum/dsc-phase-1-project/master/awesome.gif)
-
-Now you will put your new skills to use with a large end-of-Phase project! This project should take 20 to 30 hours to complete.
+# Phase 1 Project 
 
 ## Project Overview
 
-For this project, you will use exploratory data analysis to generate insights for a business stakeholder.
+For this project I used exploratory data analysis to generate insights for a business stakeholder. I was able to use importing, cleaning and data analysis tools such as pandas and also generate visualizations using scatter plots, histograms and bar graphs.
 
-### Business Problem
+## Business Problem
 
-Microsoft sees all the big companies creating original video content and they want to get in on the fun. They have decided to create a new movie studio, but they don’t know anything about creating movies. You are charged with exploring what types of films are currently doing the best at the box office. You must then translate those findings into actionable insights that the head of Microsoft's new movie studio can use to help decide what type of films to create.
+Microsoft sees all the big companies creating original video content and they want to get in on the fun. They have decided to create a new movie studio, but they don’t know anything about creating movies. I was charged with exploring what types of films are currently doing the best at the box office. I then translated those findings into actionable insights that the head of Microsoft's new movie studio can use to help decide what type of films to create.
 
-### The Data
+## Objectives
+- To determine the highest and lowest grossing movies and their ratings based on the available datasets.
+- To determine the most and least produced genres of films.
+- To determine the highest and lowest grossing movie genres.
+- To determine the average runtime and period to produce a movie.
+- To determine the relationship between the relationship between the average rating of customers based on several factors such as: the average production time, the release year of the movie and the runtime.
 
-In the folder `zippedData` are movie datasets from:
-
-* [Box Office Mojo](https://www.boxofficemojo.com/)
-* [IMDB](https://www.imdb.com/)
-* [Rotten Tomatoes](https://www.rottentomatoes.com/)
-* [TheMovieDB](https://www.themoviedb.org/)
-* [The Numbers](https://www.the-numbers.com/)
-
-It is up to you to decide what data from this to use and how to use it. If you want to make this more challenging, you can scrape websites or make API calls to get additional data. If you are feeling overwhelmed or behind (e.g. struggled with the Phase 1 Code Challenge), we recommend you use only the following data files:
+## Data Understanding
+The main sources used to extract and analyse data was from the following data files that were provided:
 
 * imdb.title.basics
 * imdb.title.ratings
 * bom.movie_gross
 
-## Deliverables
+Each record represents a movie and the column in these datasets contain features such as: title, start_year, foreign gross and domestic gross, average rating, runtime in minutes and the number of votes.
 
-There are three deliverables for this project:
+## Requirements
+- In this project, I used the data munging and visualization skills to conduct an exploratory analysis of the dataset.
 
-* A **GitHub repository**
-* A **Jupyter Notebook**
-* A **non-technical presentation**
+- I also imported datasets with pandas to import csv files and also to plot the different visualisation tools.
 
-Review the "Project Submission & Review" page in the "Milestones Instructions" topic for instructions on creating and submitting your deliverables. Refer to the rubric associated with this assignment for specifications describing high-quality deliverables.
+- I was required to clean the data to make it more useable for actionable analysis, by using the various methods of cleaning data such as dropping and replacing with the median/mean.
 
-### Key Points
+- I was required to find the features that have the strongest and negative correlations and produce plots representing these relationships.
 
-* **Your analysis should yield three concrete business recommendations.** The ultimate purpose of exploratory analysis is not just to learn about the data, but to help an organization perform better. Explicitly relate your findings to business needs by recommending actions that you think the business (Microsoft) should take.
+- I was required to create a new column generations to represent the different classifiations of movies. i.e whether old generation or new generation.
 
-* **Communicating about your work well is extremely important.** Your ability to provide value to an organization - or to land a job there - is directly reliant on your ability to communicate with them about what you have done and why it is valuable. Create a storyline your audience (the head of Microsoft's new movie studio) can follow by walking them through the steps of your process, highlighting the most important points and skipping over the rest.
 
-* **Use plenty of visualizations.** Visualizations are invaluable for exploring your data and making your findings accessible to a non-technical audience. Spotlight visuals in your presentation, but only ones that relate directly to your recommendations. Simple visuals are usually best (e.g. bar charts and line graphs), and don't forget to format them well (e.g. labels, titles).
+1. Loading the required Libraries
 
-## Getting Started
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
+%matplotlib inline
+import datetime
+import requests
 
-Please start by reviewing this assignment, the rubric at the bottom of it, and the "Project Submission & Review" page. If you have any questions, please ask your instructor ASAP.
+2. Loading the datasets
 
-Next, we recommend you check out [the Phase 1 Project Templates and Examples repo](https://github.com/learn-co-curriculum/dsc-project-template) and use the MVP template for your project.
+dfratings = pd.read_csv('zippedData/imdb.title.ratings.csv.gz')
+dfgross = pd.read_csv('zippedData/bom.movie_gross.csv.gz')
+dfbasics = pd.read_csv('zippedData/imdb.title.basics.csv.gz')
 
-Alternatively, you can fork [the Phase 1 Project Repository](https://github.com/learn-co-curriculum/dsc-phase-1-project), clone it locally, and work in the `student.ipynb` file. Make sure to also add and commit a PDF of your presentation to your repository with a file name of `presentation.pdf`.
+3. Inspecting the contents of the datasets
 
-## Project Submission and Review
+dfratings.head()
+dfgross.head()
+dfbasics.head()
+print(dfgross.shape)
+print(dfratings.shape)
+print(dfbasics.shape)
+print(dfgross.info())
+print(dfratings.info())
+print(dfbasics.info())
 
-Review the "Project Submission & Review" page in the "Milestones Instructions" topic to learn how to submit your project and how it will be reviewed. Your project must pass review for you to progress to the next Phase.
+4. Setting the primary key and joining the indiviual datasets to one dataset using the common columns
+
+dfbasics_indexed = dfbasics.set_index('tconst')
+dfbasics_indexed = dfbasics.drop('original_title',axis=1)
+joined_df1 = dfbasics_indexed.join(dfratings_indexed)
+
+5. Identifying the missing values and also the percentage to determine which method to use for filling in missing data.
+
+joined_df1.isna().sum()
+def missing_values(data):
+
+6. Replacing the missing data
+
+joined_df1['runtime_minutes'] = joined_df1['runtime_minutes'].fillna(joined_df1['runtime_minutes'].median())
+joined_df1['averagerating'] = joined_df1['averagerating'].fillna(joined_df1['averagerating'].median())
+#replacing the missing values in numvotes with an int value of 0
+joined_df1['numvotes'] = joined_df1['numvotes'].fillna(int(0))
+#replacing the missing values in genres with the definition 'missing'
+joined_df1['genres'] = joined_df1['genres'].fillna('Missing')
+
+dfgross['foreign_gross'] = dfgross['foreign_gross'].fillna(dfgross['foreign_gross'].median())
+dfgross['domestic_gross'] = dfgross['domestic_gross'].fillna(dfgross['domestic_gross'].median())
+dfgross['studio'] = dfgross['studio'].fillna('Missing')
+
+7. Obtaining the mean,median,min and max values and standard deviation of the dataset
+
+final_joined_df.describe()
+
+8. Plotting a boxplot to visualise the different gross incomes and identify outliers if any
+
+fig,ax = plt.subplots()
+ax.set_ylim(-1.0e+08,1.0e+08)
+final_joined_df.boxplot(column=['domestic_gross','foreign_gross'], figsize = (20,10));
+
+9. Creating a column generations to separate between movies that were produced post 2017 inclusive and pre 2017.
+
+joined_df.loc[joined_df['year']>=2017,'generation'] = 'new_movie'
+joined_df.loc[joined_df['year']<2017,'generation'] = 'old_movie'
+joined_df.head()
+
+10. Grouping the dataset by genres 
+
+generation_mean = joined_df.groupby(['generation']).mean()
+
+11. Plotting a histogram and scatter plots to analyse the data further
+
+columns1 = joined_df.columns
+joined_df[columns1].hist(figsize=(16,16));
+pd.plotting.scatter_matrix(joined_df, figsize = (20,20));
+
+columns2 =  generation_mean.columns
+generation_mean[columns2].hist(figsize=(16,10)
+    
+12. Introducing placeholders to the dataset
+
+for col in ['primary_title','start_year','runtime_minutes','genres','averagerating','numvotes','studio','domestic_gross','foreign_gross','year']:
+    print('Values for {}:\n{}\n\n'.format(col, final_joined_df[col].unique()))
+    
+13. Grouping the dataset with reference to the genres
+
+grouped_genres = joined_df.groupby('genres').mean()
+grouped_genres.sort
+
+
+## Observations
+
+Average rating: - Has a minimal positive correlation between the numvotes, and both domestic and foreign gross gains.
+Runtime minutes: - Has a minimal positive correlation with foreign and domestic gross gains.
+Domestic_gross: - Has a strong positive correlation witht foreign gross.
+Year: - Has almost zero correlation with the domestic and foreign gross.
+
+The top grossing movie is Black Panther and the least grossing movie is Storage 24.
+
+Most of the highest grossing films were movies that were produced post 2017 inclusive. Whereas, the least grossing films were movies that were produced pre-2017.
+
+The new movies have an average production time of approximately 1 year.
+
+The runtimes of both new and old movies is approximately the same at 104~105 minutes.
+
+New movies have a fairly longer production time of at least one year as compared to older movies, which begin and complete production within the same year.
 
 ## Summary
 
-This project will give you a valuable opportunity to develop your data science skills using real-world data. The end-of-phase projects are a critical part of the program because they give you a chance to bring together all the skills you've learned, apply them to realistic projects for a business stakeholder, practice communication skills, and get feedback to help you improve. You've got this!
+The highest and lowest grossing films from the data were; Black Panther and Storage 24 respectively.
+
+The highest and lowest grossing genres from the data were; Adventure-Drama-Sport and Action-Horror-Mystery respectively.
+
+The highest produced genre of films are; Drama, Documentaries, Comedy and Romance films.
+The least produced films were Action- Romance, Action-Comedy-Sport, Action-Biography-History and Sport.
+
+
+
+
+
+
